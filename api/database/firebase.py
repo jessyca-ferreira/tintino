@@ -76,10 +76,9 @@ class FirebaseDB(DatabaseInterface):
             name=user_data.name
         )
         
-        write_result = self.db.collection('users').document(user_id).set(user.model_dump())
-        # Force the write to complete
-        if hasattr(write_result, 'get'):
-            write_result.get()
+        doc_ref = self.db.collection('users').document(user_id)
+        doc_ref.set(user.model_dump())
+        doc_ref.get()
         return user
 
     def get_user(self, user_id: str) -> User:
