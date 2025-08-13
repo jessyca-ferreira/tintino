@@ -13,13 +13,15 @@ logger = get_logger(__name__)
 security_bearer = HTTPBearer()
 DEFAULT_USER = config.get("APISettings", {}).get("test_user", "")
 
-# Obter o project_id do firebase.json para validação
 try:
-    with open(get_credentials_file(), 'r') as f:
-        firebase_config = json.load(f)
+    firebase_config_str = os.getenv('FIREBASE_CREDENTIALS_JSON')
+    if firebase_config_str:
+        firebase_config = json.loads(firebase_config_str)
         EXPECTED_PROJECT_ID = firebase_config.get('project_id')
+    else:
+        raise ValueError("Variável de ambiente FIREBASE_CONFIG_JSON não encontrada")
 except Exception as e:
-    logger.error(f"Erro ao carregar firebase.json: {e}")
+    logger.error(f"Erro ao carregar config do Firebase da variável de ambiente: {e}")
     EXPECTED_PROJECT_ID = None
 
 def _verify_token_core(token: str) -> str:
